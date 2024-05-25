@@ -1,0 +1,23 @@
+{
+  "name": "file-compressor",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "fs": "^0.0.1-security",
+    "heapq": "^0.0.3",
+    "next": "14.2.2",
+    "python-shell": "^5.0.0",
+    "react": "^18",
+    "react-dom": "^18"
+  },
+  "devDependencies": {
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1"
+  }
+}

@@ -2,7 +2,7 @@ import heapq
 import os
 
 """
-author: Bhrigu Srivastava
+author: Sahil Yadav
 website: https:bhrigu.me
 """
 
