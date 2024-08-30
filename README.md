@@ -1,4 +1,3 @@
-Certainly! Let's walk through how Huffman coding works theoretically with a simple example.
 
 ### Huffman Coding Overview
 
