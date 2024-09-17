@@ -116,3 +116,67 @@ Consider the following text:
 - **Padding and Storage**: Optionally pad the binary string and store it with the necessary metadata.
 
 By following these steps, Huffman coding compresses data efficiently by reducing the average code length for more frequent characters, making it a powerful technique for data compression.
+
+
+To estimate the amount of data required before and after compression using Huffman coding, let’s break it down with your example "ABRACADABRA."
+
+### 1. Initial Data Size Calculation
+
+**Original Text:**
+"ABRACADABRA"
+
+**Character Frequencies:**
+- A: 5
+- B: 2
+- R: 2
+- C: 1
+- D: 1
+
+**Character Frequencies and Assumed Initial Encoding:**
+If each character is initially represented using standard ASCII encoding, each character takes up 8 bits (1 byte). 
+
+For the given text of length 11 characters, the initial size is:
+\[ \text{Initial Size} = 11 \text{ characters} \times 8 \text{ bits/character} = 88 \text{ bits} \]
+
+### 2. Compressed Data Size Calculation
+
+**Huffman Codes Generated:**
+- A: 0 (1 bit)
+- B: 110 (3 bits)
+- R: 111 (3 bits)
+- C: 10 (2 bits)
+- D: 11 (2 bits)
+
+**Encoded Text:**
+The encoded text for "ABRACADABRA" using the Huffman codes:
+- A: 0
+- B: 110
+- R: 111
+- C: 10
+- D: 11
+- A: 0
+- B: 110
+- A: 0
+- R: 111
+- A: 0
+
+**Binary String:**
+0 110 111 10 0 11 0 110 0 111 0
+
+**Concatenate the Binary String:**
+0 (1 bit) + 110 (3 bits) + 111 (3 bits) + 10 (2 bits) + 0 (1 bit) + 11 (2 bits) + 0 (1 bit) + 110 (3 bits) + 0 (1 bit) + 111 (3 bits) + 0 (1 bit)  
+= 1 + 3 + 3 + 2 + 1 + 2 + 1 + 3 + 1 + 3 + 1 = 22 bits
+
+**Data Size After Compression:**
+The compressed data size is 22 bits. 
+
+### Summary
+
+**Initial Size:** 88 bits  
+**Compressed Size:** 22 bits
+
+**Compression Ratio:**
+\[ \text{Compression Ratio} = \frac{\text{Compressed Size}}{\text{Initial Size}} = \frac{22}{88} = \frac{1}{4} = 0.25 \]
+This means the compressed data is 25% of the original size, or in other words, a 75% reduction.
+
+Huffman coding has significantly reduced the data size in this example, showing how effective it can be for compression based on the frequency of characters in the text.
