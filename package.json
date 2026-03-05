@@ -11,7 +11,7 @@
   "dependencies": {
     "fs": "^0.0.1-security",
     "heapq": "^0.0.3",
-    "next": "14.2.2",
+    "next": "^16.1.6",
     "python-shell": "^5.0.0",
     "react": "^18",
     "react-dom": "^18"
