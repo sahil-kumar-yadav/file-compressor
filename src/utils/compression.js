@@ -1,6 +1,8 @@
 // Unified Compression Handler for Text, Image, and Video files
+// Now with proper binary output and efficient compression
+
 import { encodeText, decodeText } from './huffmanCoding';
-import { lzwCompress, lzwDecompress } from './lzwCompression';
+import { lzwCompress, lzwDecompress, arrayToBase64, base64ToArray } from './lzwCompression';
 
 // File type detection
 export function detectFileType(file) {
@@ -21,7 +23,7 @@ export function detectFileType(file) {
         return 'text';
     }
     
-    // Default to binary (treat as image for compression purposes)
+    // Default to binary
     return 'binary';
 }
 
@@ -37,34 +39,47 @@ export async function compressFile(file) {
         // Use Huffman coding for text
         const text = new TextDecoder().decode(uint8Array);
         const result = encodeText(text);
+        
+        // Convert binary data to base64 for storage
+        const base64Data = arrayToBase64(result.encodedData);
+        
         compressed = {
-            encodedText: result.encodedText,
-            codes: JSON.parse(result.codesString)
+            encodedData: base64Data,
+            codes: result.codesString,
+            originalSize: result.originalSize
         };
         algorithm = 'huffman';
         metadata = { originalSize: text.length, fileType: 'text' };
     } else {
-        // Use LZW for images and videos - store as JSON string (numbers array)
-        const lzwCompressed = lzwCompress(uint8Array);
-        // Store compressed data as JSON string to avoid base64 encoding issues
+        // Use LZW for images and videos with proper binary output
+        const lzwResult = lzwCompress(uint8Array);
+        
+        // Convert binary data to base64 for storage
+        const base64Data = arrayToBase64(lzwResult.data);
+        
         compressed = {
-            data: JSON.stringify(lzwCompressed),
-            originalSize: uint8Array.length
+            encodedData: base64Data,
+            originalSize: lzwResult.originalSize
         };
         algorithm = 'lzw';
         metadata = { originalSize: uint8Array.length, fileType };
     }
     
+    // Calculate actual compressed size in bytes
+    const compressedDataString = JSON.stringify(compressed);
+    const compressedSize = compressedDataString.length;
+    const originalSize = uint8Array.length;
+    
     // Calculate compression ratio
-    const compressedSize = JSON.stringify(compressed).length;
-    const ratio = ((1 - compressedSize / uint8Array.length) * 100).toFixed(2);
+    const ratio = originalSize > 0 ? 
+        ((1 - compressedSize / originalSize) * 100).toFixed(2) : 0;
     
     return {
         success: true,
         algorithm,
         fileType,
         fileName: file.name,
-        originalSize: uint8Array.length,
+        originalSize,
         compressedSize,
         ratio: Math.max(0, ratio),
         data: compressed,
@@ -79,8 +94,8 @@ export async function decompressFile(compressedData, originalFileName, algorithm
         
         if (algorithm === 'huffman') {
             // Decode text using Huffman
-            const codesString = JSON.stringify(compressedData.codes);
-            decompressed = decodeText(compressedData.encodedText, codesString);
+            const encodedData = base64ToArray(compressedData.encodedData);
+            decompressed = decodeText(encodedData, compressedData.codes, compressedData.originalSize);
             
             // Create download
             const blob = new Blob([decompressed], { type: 'text/plain' });
@@ -91,9 +106,9 @@ export async function decompressFile(compressedData, originalFileName, algorithm
                 fileType: 'text'
             };
         } else if (algorithm === 'lzw') {
-            // Decode using LZW - parse JSON string to get numbers array
-            const lzwData = JSON.parse(compressedData.data);
-            const decompressedArray = lzwDecompress(lzwData);
+            // Decode using LZW
+            const encodedData = base64ToArray(compressedData.encodedData);
+            const decompressedArray = lzwDecompress(encodedData, compressedData.originalSize);
             
             // Determine MIME type based on fileType
             let mimeType = 'application/octet-stream';
